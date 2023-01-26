@@ -1,0 +1,44 @@
+[
+    {
+        "End": "1/4/2023 5:00 PM",
+        "Start": "1/4/2023 3:00 PM",
+        "Subject": "[Starfruit] Gap Fit - PSC Deck and CR Estimator",
+        "Type": "CalendarEvent",
+        "Venue": "The Authority - 20 Science Park Drive"
+    },
+    {
+        "End": "1/5/2023 4:00 PM",
+        "Start": "1/5/2023 3:15 PM",
+        "Subject": "Explorance/CSIT Post Demo Activities",
+        "Type": "CalendarEvent",
+        "Venue": "Microsoft Teams Meeting"
+    },
+    {
+        "End": "1/6/2023 4:30 PM",
+        "Start": "1/6/2023 2:30 PM",
+        "Subject": "Discussion on work opportunity",
+        "Type": "CalendarEvent",
+        "Venue": ""
+    },
+    {
+        "End": "1/11/2023 2:45 PM",
+        "Start": "1/11/2023 2:00 PM",
+        "Subject": "SumTotal Guided Lab Requirement Review & Planning Meeting",
+        "Type": "CalendarEvent",
+        "Venue": "Microsoft Teams Meeting"
+    },
+    {
+        "End": "1/16/2023 4:00 PM",
+        "Start": "1/16/2023 2:00 PM",
+        "Subject": "[Starfruit] PSC - Gap Fit",
+        "Type": "CalendarEvent",
+        "Venue": "Science Park"
+    },
+    {
+        "End": "1/11/2023 4:30 PM",
+        "Start": "1/11/2023 4:00 PM",
+        "Subject": "Product Backlog Discussion",
+        "Type": "CalendarEvent",
+        "Venue": ""
+    }
+]

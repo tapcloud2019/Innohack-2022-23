@@ -1,0 +1,9 @@
+[
+    {
+        "duration": "Full Day",
+        "endDate": "2023-01-20",
+        "leaveType": "Vacation",
+        "startDate": "2023-01-10",
+        "type": "LEAVE"
+    }
+]

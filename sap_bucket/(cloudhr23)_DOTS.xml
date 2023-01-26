@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<all>
+	<item type="dict">
+		<country type="list">
+			<item type="dict">
+				<Column1 type="str">France</Column1>
+			</item>
+			<item type="dict">
+				<Column1 type="str">Japan</Column1>
+			</item>
+		</country>
+		<endDate type="str">2023-01-19</endDate>
+		<kinInfo type="list">
+			<item type="dict">
+				<Value type="dict">
+					<contactNum type="str">91123456</contactNum>
+					<name type="str">Tan</name>
+				</Value>
+			</item>
+			<item type="dict">
+				<Value type="dict">
+					<contactNum type="null"/>
+					<name type="str"/>
+				</Value>
+			</item>
+			<item type="dict">
+				<Value type="dict">
+					<contactNum type="null"/>
+					<name type="str"/>
+				</Value>
+			</item>
+		</kinInfo>
+		<startDate type="str">2023-01-09</startDate>
+		<transportMode type="str">Airplane</transportMode>
+		<type type="str">DOTS</type>
+	</item>
+</all>

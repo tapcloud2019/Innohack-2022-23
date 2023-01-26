@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<all>
+	<item type="dict">
+		<endDate type="str">2022-12-30</endDate>
+		<endTime type="str">2000</endTime>
+		<startDate type="str">2022-12-20</startDate>
+		<startTime type="str">0930</startTime>
+		<title type="str">I am away from office now</title>
+		<type type="str">CreateCalendar</type>
+	</item>
+</all>
