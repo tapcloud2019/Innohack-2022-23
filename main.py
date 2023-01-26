@@ -29,6 +29,45 @@ def sap_bucket():
 def processed_path():
     return ".\processed"
 
+def handle_xml_type(filepath, filename):
+
+    if "LEAVE" in filename:
+        print("\tLEAVE json detected")
+        process_leave(filepath, filename)
+    elif "DOTS" in filename:
+        print("\tDOTS json detected")
+        process_dots(filepath, filename)
+    elif "CALENDAR" in filename:
+        print("\tCALENDAR json detected")
+        process_for_outlook(filePath, filename)
+        send_invite()
+
+def process_leave(filepath, filename):
+    with open(filepath, "r") as file:
+        jsonstring = j.load(file)
+
+    newxmltag = "pwa_leave_item-subty"
+
+    leavetypes = {
+        'Vacation': '0100',
+        'Medical': '0200',
+        'Medical without MC': '0201',
+        'Childcare with MC': '0430',
+        'Childcare without MC': '0440',
+        'Compassionate': '0810',
+        'Parent Care': '0821',
+    }
+
+    if jsonstring[0]['leaveType'] in leavetypes:
+        jsonstring[0][newxmltag] = leavetypes[jsonstring[0]['leaveType']]
+        print(f'\t{jsonstring[0]["leaveType"]} leave detected')
+    else:
+        print("No matching leave type!")
+
+    with open(filepath, 'w') as file:
+        j.dump(jsonstring, file)
+def process_dots(filepath, filename):
+    print('\tDOTS handling still undefined')
 def process_for_outlook(filepath, filename):
     with open(filepath, "r") as file:
         filedata = file.read()
@@ -180,10 +219,6 @@ if __name__ == '__main__':
         filePath = os.path.join(inbox_path(), filename)
         # checking if it is a file
         if os.path.isfile(filePath):
-            print(filePath)
-            #process_for_sap(filePath,filename)
-            process_for_outlook(filePath,filename)
-
-    send_invite()
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+            print("Processing file", filePath)
+            handle_xml_type(filePath, filename)
+            print("Done with", filePath, "\n")
