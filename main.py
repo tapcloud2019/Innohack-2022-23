@@ -1,5 +1,4 @@
 # Script to convert json to xml and dump it to a directory.
-import self as self
 from icalendar import vCalAddress
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -14,7 +13,7 @@ import os
 import email.mime.text
 import email.mime.base
 import email.mime.multipart
-import smtplib
+
 import datetime as dt
 import icalendar
 import pytz
@@ -33,16 +32,18 @@ def handle_xml_type(filepath, filename):
 
     if "LEAVE" in filename:
         print("\tLEAVE json detected")
-        process_leave(filepath, filename)
+        process_leave(filepath)
+        process_for_sap(filepath, filename)
     elif "DOTS" in filename:
         print("\tDOTS json detected")
-        process_dots(filepath, filename)
+        process_dots(filepath)
+        process_for_sap(filepath, filename)
     elif "CALENDAR" in filename:
         print("\tCALENDAR json detected")
         process_for_outlook(filePath, filename)
         send_invite()
 
-def process_leave(filepath, filename):
+def process_leave(filepath):
     with open(filepath, "r") as file:
         jsonstring = j.load(file)
 
@@ -66,8 +67,9 @@ def process_leave(filepath, filename):
 
     with open(filepath, 'w') as file:
         j.dump(jsonstring, file)
-def process_dots(filepath, filename):
+def process_dots(filepath):
     print('\tDOTS handling still undefined')
+
 def process_for_outlook(filepath, filename):
     with open(filepath, "r") as file:
         filedata = file.read()
@@ -88,28 +90,21 @@ def process_for_sap(filepath, filename):
     # Use a breakpoint in the code line below to debug your script.
     # Press Ctrl+F8 to toggle the breakpoint.
     with open(filepath, "r") as file:
-        filedata = file.read()
-        jsonstring = j.loads(filedata)
-
-    print(jsonstring)
+        jsonstring = j.load(file)
 
     # Convert json to xml
     xmlstring = json2xml.Json2xml(jsonstring).to_xml()
-    print(xmlstring)
 
     # Write to xml file
     xmlfilename = filename.replace('.txt', '.xml')
-    xmlfile = open(xmlfilename, 'w')
-    xmlfile.write(xmlstring)
-    xmlfile.close()
+    with open(xmlfilename, "w") as xmlfile:
+        xmlfile.write(xmlstring)
 
     # Move xml file to SAP bucket
-    outputpath = os.path.join(sap_bucket(), xmlfilename)
-    shutil.move(xmlfilename, outputpath)
+    shutil.move(xmlfilename, os.path.join(sap_bucket(), xmlfilename))
 
     # Move json file to processed folder
-    processedpath = os.path.join(processed_path(), filename)
-    shutil.move(filepath, processedpath)
+    shutil.move(filepath, os.path.join(processed_path(), filename))
 
 # Imagine this function is part of a class which provides the necessary config data
 # https://learnpython.com/blog/working-with-icalendar-with-python/
@@ -221,4 +216,4 @@ if __name__ == '__main__':
         if os.path.isfile(filePath):
             print("Processing file", filePath)
             handle_xml_type(filePath, filename)
-            print("Done with", filePath, "\n")
+            print("Done processing", filePath, "\n")
