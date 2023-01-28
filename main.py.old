@@ -8,10 +8,12 @@ import os
 import email.mime.text
 import email.mime.base
 import email.mime.multipart
+import smtplib
 import datetime as dt
 import icalendar
 import pytz
 from pathlib import Path
+from datetime import datetime
 
 def inbox_path():
     return ".\inbox"
@@ -19,90 +21,13 @@ def inbox_path():
 def sap_bucket():
     return ".\sap_bucket"
 
-def processed_sap_path():
-    return ".\processed-sap"
+def processed_path():
+    return ".\processed"
 
 def processed_cal_path():
     return ".\processed-cal"
 
-def handle_xml_type(filepath, filename):
-
-    if "LEAVE" in filename:
-        print("\tLEAVE json detected")
-        process_leave(filepath)
-        process_for_sap(filepath, filename)
-    elif "DOTS" in filename:
-        print("\tDOTS json detected")
-        process_dots(filepath, filename)
-        process_for_sap(filepath, filename)
-    elif "CALENDAR" in filename:
-        print("\tCALENDAR json detected")
-        process_for_calendar(filePath, filename)
-
-def process_leave(filepath):
-    with open(filepath, "r") as file:
-        jsonstring = j.load(file)
-
-    newxmltag = "pwa_leave_item-subty"
-
-    leavetypes = {
-        'Vacation': '0100',
-        'Medical': '0200',
-        'Medical without MC': '0201',
-        'Childcare with MC': '0430',
-        'Childcare without MC': '0440',
-        'Compassionate': '0810',
-        'Parent Care': '0821',
-    }
-
-    if jsonstring[0]['leaveType'] in leavetypes:
-        jsonstring[0][newxmltag] = leavetypes[jsonstring[0]['leaveType']]
-        print(f'\t{jsonstring[0]["leaveType"]} leave detected')
-    else:
-        print("No matching leave type!")
-
-    with open(filepath, 'w') as file:
-        j.dump(jsonstring, file)
-def process_dots(filepath, filename):
-    dotsJson = {'Country1': '', 'Country2': '', 'Country3': '', 'Country4': '', 'Country5': '', 'Country6': '', 'Country7': '', 'Country8': '', 'Country9': '', 'Country10': '', 'Country11': '', 'Country12': '', 'Country13': '', 'Country14': '', 'Country15': '', 'departureDate': '', 'returnDate': '', 'departureTravelMode': '', 'returnTravelMode': '', 'travelReasons1': '', 'travelReasons2': '', 'travelReasons3': '', 'pf': ''}
-
-    with open(filepath, "r") as file:
-        jsonObj = j.load(file)
-
-    #extract and assign countries
-    countries = [''] * 15
-    idx = 0
-    for country in jsonObj[0]["country"]:
-        print(country["Column1"])
-        countries[idx] = country["Column1"]
-        idx += 1
-
-    for key, val in zip(dotsJson, countries):
-        dotsJson[key] = val
-
-    dotsJson["departureDate"] = jsonObj[0]["startDate"]
-    dotsJson["returnDate"] = jsonObj[0]["endDate"]
-    dotsJson["departureTravelMode"] = jsonObj[0]["departureTravelMode"]
-    dotsJson["returnTravelMode"] = jsonObj[0]["returnTravelMode"]
-    dotsJson["travelReasons1"] = jsonObj[0]["travelReasons"]
-
-    # add pf from filename format: pf,email,datetime,(CloudHR)_TYPE.TXT
-    dotsJson["pf"] = filename.split(",")[0]
-
-    #add parent item field
-    dotsJson = {"item": dotsJson}
-
-    jsonstring = j.dumps(dotsJson)
-    jsonstring = j.loads(jsonstring.replace("\"'", '"'))
-    print(jsonstring)
-
-    with open(filepath, 'w') as file:
-        j.dump(jsonstring, file)
-
 def process_for_calendar(filepath, filename):
-    # retrieve email from filename format: pf,email,datetime,(CloudHR)_TYPE.TXT
-    recipient = filename.split(",")[1]
-
     with open(filepath, "r") as file:
         filedata = file.read()
         jsonstring = j.loads(filedata)
@@ -141,35 +66,47 @@ def process_for_calendar(filepath, filename):
         endHH = endHMS[0]
         endMM = endHMS[1]
 
-        send_invite(recipient,endY,endM,endD,endHH,endMM,startY,startM,startD,startHH,startMM,subject,venue)
-
-    shutil.move(filepath, os.path.join(processed_cal_path(), filename))
+        send_invite(endY,endM,endD,endHH,endMM,startY,startM,startD,startHH,startMM,subject,venue)
 
 def process_for_sap(filepath, filename):
+    # Use a breakpoint in the code line below to debug your script.
+    # Press Ctrl+F8 to toggle the breakpoint.
     with open(filepath, "r") as file:
-        jsonObj = j.load(file)
+        filedata = file.read()
+        jsonstring = j.loads(filedata)
 
-    xmlstring = json2xml.Json2xml(jsonObj).to_xml()
+    print(jsonstring)
+
+    # Convert json to xml
+    xmlstring = json2xml.Json2xml(jsonstring).to_xml()
     print(xmlstring)
-    xmlfilename = filename.replace('.TXT', '.XML') #case sensitive!
-    with open(xmlfilename, "w") as xmlfile:
-        xmlfile.write(xmlstring)
 
-    shutil.move(xmlfilename, os.path.join(sap_bucket(), xmlfilename))
-    shutil.move(filepath, os.path.join(processed_sap_path(), filename))
+    # Write to xml file
+    xmlfilename = filename.replace('.txt', '.xml')
+    xmlfile = open(xmlfilename, 'w')
+    xmlfile.write(xmlstring)
+    xmlfile.close()
 
+    # Move xml file to SAP bucket
+    outputpath = os.path.join(sap_bucket(), xmlfilename)
+    shutil.move(xmlfilename, outputpath)
+
+    # Move json file to processed folder
+    processedpath = os.path.join(processed_path(), filename)
+    shutil.move(filepath, processedpath)
+
+# Imagine this function is part of a class which provides the necessary config data
 # https://learnpython.com/blog/working-with-icalendar-with-python/
 # https://www.baryudin.com/blog/entry/sending-outlook-appointments-python/
-def send_invite(recipient, endy, endm, endd, endhh, endmm, starty, startm, startd, starthh, startmm, subject, venue):
+def send_invite(endy, endm, endd, endhh, endmm, starty, startm, startd, starthh, startmm, subject, venue):
     # Build the event
     cal = icalendar.Calendar()
     cal.add('prodid', '-//Unclass calendar event //example.com//')
     cal.add('version', '2.0')
     cal.add('method', "REQUEST")
 
-    attendee = 'MAILTO:' + recipient
     event = icalendar.Event()
-    attendee_email = vCalAddress(attendee)
+    attendee_email = vCalAddress('MAILTO:rdoe@example.com')
     event.add('attendee', attendee_email, encode=0)
     organiser_email = vCalAddress('MAILTO:service@example.com')
     event.add('organizer', organiser_email)
@@ -183,7 +120,6 @@ def send_invite(recipient, endy, endm, endd, endhh, endmm, starty, startm, start
     event['uid'] = 1234
     event.add('priority', 5)
     event.add('sequence', 1)
-
     #event.add('attendee', attendee_email)
     #event.add('organizer', organiser_email)
     #event.add('description', "Meeting with vendor")
@@ -195,6 +131,7 @@ def send_invite(recipient, endy, endm, endd, endhh, endmm, starty, startm, start
     #event.add('dtstamp', tz.localize(dt.datetime.combine(self.date, dt.time(6, 0, 0))))
     #event['uid'] = self.get_unique_id() # Generate some unique ID
     #event.add('created', tz.localize(dt.datetime.now()))
+
     # Add a reminder
     #alarm = icalendar.Alarm()
     #alarm.add("action", "DISPLAY")
@@ -211,6 +148,7 @@ def send_invite(recipient, endy, endm, endd, endhh, endmm, starty, startm, start
     msg["From"] = organiser_email
     msg["To"] = attendee_email
     msg["Content-class"] = "urn:content-classes:calendarmessage"
+    #msg.attach(email.MIMEText.MIMEText(description))
     msg.attach(email.mime.text.MIMEText(subject))
 
     filename = "invite.ics"
@@ -228,7 +166,7 @@ def send_invite(recipient, endy, endm, endd, endhh, endmm, starty, startm, start
     #s.sendmail(msg["From"], [msg["To"]], msg.as_string())
     #s.quit()
 
-    # Write calendar invite to disk
+    # Write calender invite to disk
     directory = Path.cwd() / 'processed-cal'
     try:
         directory.mkdir(parents=True, exist_ok=False)
@@ -249,7 +187,7 @@ def send_invite(recipient, endy, endm, endd, endhh, endmm, starty, startm, start
     for component in ecal.walk():
         print(component.name)
         if component.name == "VEVENT":
-            print(component.get("attendee"))
+            print(component.get("name"))
             print(component.get("description"))
             print(component.get("summary"))
             print(component.get("location"))
@@ -264,6 +202,8 @@ if __name__ == '__main__':
         filePath = os.path.join(inbox_path(), filename)
         # checking if it is a file
         if os.path.isfile(filePath):
-            print("Processing file", filePath)
-            handle_xml_type(filePath, filename)
-            print("Done processing", filePath, "\n")
+            print(filePath)
+            #process_for_sap(filePath,filename)
+            process_for_calendar(filePath,filename)
+
+# See PyCharm help at https://www.jetbrains.com/help/pycharm/
