@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Unclass calendar event //example.com//
+METHOD:REQUEST
+BEGIN:VEVENT
+SUMMARY:Explorance/CSIT Post Demo Activities
+DTSTART:20230105T151500Z
+DTEND:20230105T160000Z
+UID:1234
+SEQUENCE:1
+ATTENDEE:MAILTO:tan_ah_kow@hotmail.com
+CATEGORY:Event
+DESCRIPTION:Explorance/CSIT Post Demo Activities
+LOCATION:Microsoft Teams Meeting
+ORGANIZER:MAILTO:service@example.com
+PRIORITY:5
+STATUS:confirmed
+END:VEVENT
+END:VCALENDAR

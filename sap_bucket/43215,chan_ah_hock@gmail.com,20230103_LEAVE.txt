@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<all>
+	<item type="dict">
+		<duration type="str">Full Day</duration>
+		<endDate type="str">2023-01-20</endDate>
+		<leaveType type="str">Vacation</leaveType>
+		<startDate type="str">2023-01-10</startDate>
+		<type type="str">LEAVE</type>
+		<pwa_leave_item-subty type="str">0100</pwa_leave_item-subty>
+		<pf type="str">43215</pf>
+	</item>
+</all>

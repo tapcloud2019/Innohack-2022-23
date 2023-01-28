@@ -33,5 +33,6 @@
 		<startDate type="str">2023-01-09</startDate>
 		<transportMode type="str">Airplane</transportMode>
 		<type type="str">DOTS</type>
+		<pf type="str">54321</pf>
 	</item>
 </all>

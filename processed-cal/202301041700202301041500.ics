@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Unclass calendar event //example.com//
+METHOD:REQUEST
+BEGIN:VEVENT
+SUMMARY:[Starfruit] Gap Fit - PSC Deck and CR Estimator
+DTSTART:20230104T150000Z
+DTEND:20230104T170000Z
+UID:1234
+SEQUENCE:1
+ATTENDEE:MAILTO:tan_ah_kow@hotmail.com
+CATEGORY:Event
+DESCRIPTION:[Starfruit] Gap Fit - PSC Deck and CR Estimator
+LOCATION:The Authority - 20 Science Park Drive
+ORGANIZER:MAILTO:service@example.com
+PRIORITY:5
+STATUS:confirmed
+END:VEVENT
+END:VCALENDAR
