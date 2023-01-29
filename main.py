@@ -1,6 +1,7 @@
-# Script to convert json to xml and dump it to a directory.
+# Script to process incoming JSON files from Powerapps
 from dateutil import parser
 from icalendar import vCalAddress
+import xml.etree.ElementTree as ET
 from json2xml import json2xml
 import json as j
 import shutil
@@ -29,19 +30,22 @@ def handle_xml_type(filepath, filename):
 
     if "LEAVE" in filename:
         print("\tLEAVE json detected")
-        process_leave(filepath)
-        process_for_sap(filepath, filename)
+        process_leave(filepath, filename)
+        process_for_sap(filepath, filename, "LEAVE")
     elif "DOTS" in filename:
         print("\tDOTS json detected")
         process_dots(filepath, filename)
-        process_for_sap(filepath, filename)
+        process_for_sap(filepath, filename, "DOTS")
     elif "CALENDAR" in filename:
         print("\tCALENDAR json detected")
         process_for_calendar(filePath, filename)
 
-def process_leave(filepath):
+def process_leave(filepath, filename):
     with open(filepath, "r") as file:
         jsonstring = j.load(file)
+
+    # add pf from filename format: pf,email,datetime,(CloudHR)_TYPE.TXT
+    jsonstring[0]["pf"] = filename.split(",")[0]
 
     newxmltag = "pwa_leave_item-subty"
 
@@ -63,6 +67,7 @@ def process_leave(filepath):
 
     with open(filepath, 'w') as file:
         j.dump(jsonstring, file)
+
 def process_dots(filepath, filename):
     dotsJson = {'Country1': '', 'Country2': '', 'Country3': '', 'Country4': '', 'Country5': '', 'Country6': '', 'Country7': '', 'Country8': '', 'Country9': '', 'Country10': '', 'Country11': '', 'Country12': '', 'Country13': '', 'Country14': '', 'Country15': '', 'departureDate': '', 'returnDate': '', 'departureTravelMode': '', 'returnTravelMode': '', 'travelReasons1': '', 'travelReasons2': '', 'travelReasons3': '', 'pf': ''}
 
@@ -145,7 +150,7 @@ def process_for_calendar(filepath, filename):
 
     shutil.move(filepath, os.path.join(processed_cal_path(), filename))
 
-def process_for_sap(filepath, filename):
+def process_for_sap(filepath, filename, type):
     with open(filepath, "r") as file:
         jsonObj = j.load(file)
 
@@ -154,6 +159,14 @@ def process_for_sap(filepath, filename):
     xmlfilename = filename.replace('.TXT', '.XML') #case sensitive!
     with open(xmlfilename, "w") as xmlfile:
         xmlfile.write(xmlstring)
+
+    #modify the default type property value (dict)
+    xmlTree = ET.parse(xmlfilename)
+    rootElement = xmlTree.getroot()
+    for element in rootElement.findall("item"):
+        element.set('type', type)
+
+    xmlTree.write(xmlfilename, encoding='UTF-8', xml_declaration=True)
 
     shutil.move(xmlfilename, os.path.join(sap_bucket(), xmlfilename))
     shutil.move(filepath, os.path.join(processed_sap_path(), filename))
@@ -259,10 +272,10 @@ def send_invite(recipient, endy, endm, endd, endhh, endmm, starty, startm, start
 
 # Main function
 if __name__ == '__main__':
-    # iterate over incoming json files directory
+
     for filename in os.listdir(inbox_path()):
         filePath = os.path.join(inbox_path(), filename)
-        # checking if it is a file
+
         if os.path.isfile(filePath):
             print("Processing file", filePath)
             handle_xml_type(filePath, filename)

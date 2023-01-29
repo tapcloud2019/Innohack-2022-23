@@ -1,28 +1,28 @@
-<?xml version="1.0" ?>
+<?xml version='1.0' encoding='UTF-8'?>
 <all>
-	<item type="dict">
+	<item type="DOTS">
 		<Country1 type="str">China</Country1>
 		<Country2 type="str">Japan</Country2>
 		<Country3 type="str">Indonesia</Country3>
-		<Country4 type="str"/>
-		<Country5 type="str"/>
-		<Country6 type="str"/>
-		<Country7 type="str"/>
-		<Country8 type="str"/>
-		<Country9 type="str"/>
-		<Country10 type="str"/>
-		<Country11 type="str"/>
-		<Country12 type="str"/>
-		<Country13 type="str"/>
-		<Country14 type="str"/>
-		<Country15 type="str"/>
+		<Country4 type="str" />
+		<Country5 type="str" />
+		<Country6 type="str" />
+		<Country7 type="str" />
+		<Country8 type="str" />
+		<Country9 type="str" />
+		<Country10 type="str" />
+		<Country11 type="str" />
+		<Country12 type="str" />
+		<Country13 type="str" />
+		<Country14 type="str" />
+		<Country15 type="str" />
 		<departureDate type="str">2023-01-28</departureDate>
 		<returnDate type="str">2023-02-11</returnDate>
 		<departureTravelMode type="str">Aircraft</departureTravelMode>
 		<returnTravelMode type="str">Ferry / Ship</returnTravelMode>
 		<travelReasons1 type="str">Recreational</travelReasons1>
-		<travelReasons2 type="str"/>
-		<travelReasons3 type="str"/>
+		<travelReasons2 type="str" />
+		<travelReasons3 type="str" />
 		<pf type="str">51234</pf>
 	</item>
 </all>
